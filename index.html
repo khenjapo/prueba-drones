@@ -3,9 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Visor GLB</title>
+  <title>Visor 3D</title>
   <style>
-    html, body {
+    html,
+    body {
       width: 100%;
       height: 100%;
       margin: 0;
@@ -14,13 +15,11 @@
       font-family: Arial, sans-serif;
     }
 
-    #app {
-      position: fixed;
-      inset: 0;
-    }
-
-    canvas {
+    model-viewer {
       display: block;
+      width: 100%;
+      height: 100%;
+      background: transparent;
     }
 
     #status {
@@ -51,159 +50,45 @@
       font-size: 12px;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
     }
-
-    #reset {
-      position: fixed;
-      left: 12px;
-      bottom: 12px;
-      z-index: 10;
-      border: 0;
-      border-radius: 999px;
-      padding: 10px 14px;
-      background: #ffd166;
-      color: #102040;
-      font-weight: 700;
-      cursor: pointer;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
-    }
-
-    #reset:active {
-      transform: translateY(1px);
-    }
   </style>
+  <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
 </head>
 <body>
-  <div id="app"></div>
   <div id="status">Cargando visor 3D y modelo...</div>
-  <div id="hint">Arrastra para orbitar, rueda para zoom, doble toque para acercar</div>
-  <button id="reset" type="button">Centrar modelo</button>
+  <div id="hint">Arrastra para orbitar, pellizca o rueda para zoom</div>
 
-  <script type="module">
-    import * as THREE from "https://unpkg.com/three@0.180.0/build/three.module.js";
-    import { OrbitControls } from "https://unpkg.com/three@0.180.0/examples/jsm/controls/OrbitControls.js";
-    import { GLTFLoader } from "https://unpkg.com/three@0.180.0/examples/jsm/loaders/GLTFLoader.js";
-    import { DRACOLoader } from "https://unpkg.com/three@0.180.0/examples/jsm/loaders/DRACOLoader.js";
+  <model-viewer
+    id="viewer"
+    src="./prueba-1.glb"
+    alt="Modelo 3D generado por WebODM"
+    camera-controls
+    auto-rotate
+    shadow-intensity="1"
+    exposure="1"
+    environment-image="neutral"
+    camera-orbit="0deg 75deg auto"
+    min-camera-orbit="auto auto 0.5m"
+    max-camera-orbit="auto auto 200m"
+    field-of-view="35deg"
+    interaction-prompt="none">
+  </model-viewer>
 
+  <script>
     const statusEl = document.getElementById("status");
-    const resetButton = document.getElementById("reset");
-    const app = document.getElementById("app");
+    const viewer = document.getElementById("viewer");
 
-    const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x0b1020);
-    scene.fog = new THREE.Fog(0x0b1020, 40, 250);
-
-    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 5000);
-    camera.position.set(0, 0, 12);
-
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.outputColorSpace = THREE.SRGBColorSpace;
-    renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.1;
-    app.appendChild(renderer.domElement);
-
-    const controls = new OrbitControls(camera, renderer.domElement);
-    controls.enableDamping = true;
-    controls.dampingFactor = 0.08;
-    controls.target.set(0, 0, 0);
-    controls.minDistance = 0.5;
-    controls.maxDistance = 500;
-
-    const ambient = new THREE.AmbientLight(0xffffff, 1.8);
-    scene.add(ambient);
-
-    const keyLight = new THREE.DirectionalLight(0xffffff, 2.4);
-    keyLight.position.set(3, 6, 5);
-    scene.add(keyLight);
-
-    const fillLight = new THREE.DirectionalLight(0x8cb4ff, 1.0);
-    fillLight.position.set(-4, 2, -3);
-    scene.add(fillLight);
-
-    let modelRoot = null;
-
-    function setStatus(message) {
-      statusEl.textContent = message;
-    }
-
-    function frameModel(object) {
-      const box = new THREE.Box3().setFromObject(object);
-      const size = new THREE.Vector3();
-      const center = new THREE.Vector3();
-      box.getSize(size);
-      box.getCenter(center);
-
-      object.position.sub(center);
-
-      const maxDim = Math.max(size.x, size.y, size.z);
-      const fov = THREE.MathUtils.degToRad(camera.fov);
-      const distance = Math.max(2, (maxDim / 2) / Math.tan(fov / 2)) * 1.2;
-
-      camera.near = Math.max(0.01, maxDim / 1000);
-      camera.far = Math.max(1000, maxDim * 50);
-      camera.updateProjectionMatrix();
-
-      camera.position.set(0, 0, distance);
-      controls.target.set(0, 0, 0);
-      controls.update();
-    }
-
-    async function loadModel() {
-      try {
-        setStatus("Cargando modelo GLB...");
-
-        const dracoLoader = new DRACOLoader();
-        dracoLoader.setDecoderPath("https://www.gstatic.com/draco/v1/decoders/");
-
-        const loader = new GLTFLoader();
-        loader.setDRACOLoader(dracoLoader);
-
-        const gltf = await new Promise((resolve, reject) => {
-          loader.load(
-            "./prueba-1.glb",
-            resolve,
-            (event) => {
-              if (event.total) {
-                const pct = Math.round((event.loaded / event.total) * 100);
-                setStatus(`Cargando modelo GLB... ${pct}%`);
-              }
-            },
-            reject
-          );
-        });
-
-        modelRoot = gltf.scene;
-        scene.add(modelRoot);
-        frameModel(modelRoot);
-        setStatus("Modelo cargado. Arrastra para orbitar y usa el zoom para acercarte.");
-      } catch (error) {
-        console.error(error);
-        setStatus("No se pudo cargar el modelo. Mira la consola del navegador.");
-      }
-    }
-
-    resetButton.addEventListener("click", () => {
-      if (modelRoot) {
-        frameModel(modelRoot);
-        setStatus("Vista recentrada.");
-      }
+    viewer.addEventListener("load", () => {
+      statusEl.textContent = "Modelo cargado. Usa el botón de centrar o mueve la cámara.";
     });
 
-    window.addEventListener("resize", () => {
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
+    viewer.addEventListener("error", (event) => {
+      console.error(event);
+      statusEl.textContent = "No se pudo cargar el modelo. Mira la consola del navegador.";
     });
 
-    function animate() {
-      requestAnimationFrame(animate);
-      controls.update();
-      renderer.render(scene, camera);
-    }
-
-    animate();
-    loadModel();
+    viewer.addEventListener("scene-graph-ready", () => {
+      statusEl.textContent = "Modelo listo. Si se ve lejos, toca y arrastra para ajustar.";
+    });
   </script>
 </body>
 </html>
