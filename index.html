@@ -6,7 +6,7 @@
   <title>Visor Cesium GLB</title>
   <link
     rel="stylesheet"
-    href="https://cesium.com/downloads/cesiumjs/releases/1.141/Build/Cesium/Widgets/widgets.css?v=20260602-2"
+    href="https://cesium.com/downloads/cesiumjs/releases/1.141/Build/Cesium/Widgets/widgets.css"
   />
   <style>
     html,
@@ -51,9 +51,9 @@
     }
   </style>
   <script>
-    window.CESIUM_BASE_URL = "https://cesium.com/downloads/cesiumjs/releases/1.141/Build/Cesium/?v=20260602-2";
+    window.CESIUM_BASE_URL = "https://cesium.com/downloads/cesiumjs/releases/1.141/Build/Cesium/";
   </script>
-  <script src="https://cesium.com/downloads/cesiumjs/releases/1.141/Build/Cesium/Cesium.js?v=20260602-2"></script>
+  <script src="https://cesium.com/downloads/cesiumjs/releases/1.141/Build/Cesium/Cesium.js"></script>
 </head>
 <body>
   <div id="cesiumContainer"></div>
@@ -104,7 +104,7 @@
         setStatus("Cargando modelo GLB...");
 
         const model = await Cesium.Model.fromGltfAsync({
-          url: "./prueba-1.glb?v=20260602-2",
+          url: "./prueba-1.glb",
           show: true,
           scale: 1.0,
           minimumPixelSize: 64.0,
