@@ -86,14 +86,10 @@
     src="./prueba-1.glb"
     alt="Modelo 3D generado por WebODM"
     camera-controls
-    disable-pan
     shadow-intensity="1"
     exposure="1"
     environment-image="neutral"
-    camera-orbit="45deg 45deg auto"
-    min-camera-orbit="auto 5deg auto"
-    max-camera-orbit="auto 175deg auto"
-    field-of-view="35deg"
+    camera-orbit="45deg 35deg auto"
     interaction-prompt="none">
   </model-viewer>
 
@@ -116,7 +112,7 @@
     });
 
     resetButton.addEventListener("click", () => {
-      viewer.cameraOrbit = "45deg 45deg auto";
+      viewer.cameraOrbit = "45deg 35deg auto";
       viewer.cameraTarget = "auto auto auto";
       statusEl.textContent = "Vista reiniciada.";
     });
