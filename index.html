@@ -50,6 +50,25 @@
       font-size: 12px;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
     }
+
+    #reset {
+      position: fixed;
+      left: 12px;
+      bottom: 12px;
+      z-index: 10;
+      border: 0;
+      border-radius: 999px;
+      padding: 10px 14px;
+      background: #ffd166;
+      color: #102040;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+    }
+
+    #reset:active {
+      transform: translateY(1px);
+    }
   </style>
   <script>
     window.ModelViewerElement = window.ModelViewerElement || {};
@@ -60,6 +79,7 @@
 <body>
   <div id="status">Cargando visor 3D y modelo...</div>
   <div id="hint">Arrastra para orbitar, pellizca o rueda para zoom</div>
+  <button id="reset" type="button">Reset vista</button>
 
   <model-viewer
     id="viewer"
@@ -70,9 +90,9 @@
     shadow-intensity="1"
     exposure="1"
     environment-image="neutral"
-    camera-orbit="0deg 75deg auto"
-    min-camera-orbit="auto 15deg auto"
-    max-camera-orbit="auto 165deg auto"
+    camera-orbit="45deg 45deg auto"
+    min-camera-orbit="auto 5deg auto"
+    max-camera-orbit="auto 175deg auto"
     field-of-view="35deg"
     interaction-prompt="none">
   </model-viewer>
@@ -80,9 +100,10 @@
   <script>
     const statusEl = document.getElementById("status");
     const viewer = document.getElementById("viewer");
+    const resetButton = document.getElementById("reset");
 
     viewer.addEventListener("load", () => {
-      statusEl.textContent = "Modelo cargado. Arrastra para orbitar y usa pellizco/rueda para zoom.";
+      statusEl.textContent = "Modelo cargado. Puedes rodearlo y darle la vuelta para ver la parte trasera.";
     });
 
     viewer.addEventListener("error", (event) => {
@@ -92,6 +113,12 @@
 
     viewer.addEventListener("scene-graph-ready", () => {
       statusEl.textContent = "Modelo listo. Si se ve lejos, toca y arrastra para ajustar.";
+    });
+
+    resetButton.addEventListener("click", () => {
+      viewer.cameraOrbit = "45deg 45deg auto";
+      viewer.cameraTarget = "auto auto auto";
+      statusEl.textContent = "Vista reiniciada.";
     });
   </script>
 </body>
