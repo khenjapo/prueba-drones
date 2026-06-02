@@ -66,13 +66,13 @@
     src="./prueba-1.glb"
     alt="Modelo 3D generado por WebODM"
     camera-controls
-    auto-rotate
+    disable-pan
     shadow-intensity="1"
     exposure="1"
     environment-image="neutral"
     camera-orbit="0deg 75deg auto"
-    min-camera-orbit="auto auto 0.5m"
-    max-camera-orbit="auto auto 200m"
+    min-camera-orbit="auto 15deg auto"
+    max-camera-orbit="auto 165deg auto"
     field-of-view="35deg"
     interaction-prompt="none">
   </model-viewer>
@@ -82,7 +82,7 @@
     const viewer = document.getElementById("viewer");
 
     viewer.addEventListener("load", () => {
-      statusEl.textContent = "Modelo cargado. Usa el botón de centrar o mueve la cámara.";
+      statusEl.textContent = "Modelo cargado. Arrastra para orbitar y usa pellizco/rueda para zoom.";
     });
 
     viewer.addEventListener("error", (event) => {
