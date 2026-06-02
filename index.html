@@ -69,10 +69,6 @@
 
     async function main() {
       try {
-        const isMobile =
-          window.matchMedia("(max-width: 768px)").matches ||
-          /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-
         // WebODM suele exportar modelos georreferenciados; este centro parece venir en coordenadas
         // proyectadas tipo Web Mercator, así que lo convertimos a lon/lat para anclar el modelo.
         const modelOrigin = Cesium.Cartesian3.fromDegrees(3.11783675551067, 34.18884819353365, 0.0);
@@ -95,11 +91,8 @@
           vrButton: false,
           terrainProvider: new Cesium.EllipsoidTerrainProvider(),
           imageryProvider: new Cesium.GridImageryProvider(),
-          maximumRenderTimeChange: Infinity,
           useBrowserRecommendedResolution: true,
         });
-
-        viewer.resolutionScale = isMobile ? 0.75 : 1.0;
 
         viewer.scene.globe.show = false;
         viewer.scene.skyBox = undefined;
@@ -114,7 +107,7 @@
           url: "./prueba-1.glb",
           show: true,
           scale: 1.0,
-          minimumPixelSize: isMobile ? 256.0 : 64.0,
+          minimumPixelSize: 64.0,
           modelMatrix,
         });
 
@@ -124,16 +117,12 @@
           modelMatrix,
           new Cesium.HeadingPitchRange(
             Cesium.Math.toRadians(20.0),
-            Cesium.Math.toRadians(-20.0),
-            isMobile ? 450.0 : 1200.0
+            Cesium.Math.toRadians(-25.0),
+            1200.0
           )
         );
 
-        setStatus(
-          isMobile
-            ? "Modelo cargado en modo móvil. Si se ve pequeño, haz doble toque para acercar."
-            : "Modelo cargado. Ya ajusté cámara y rotación; prueba a orbitar y hacer zoom."
-        );
+        setStatus("Modelo cargado. Ya ajusté cámara y rotación; prueba a orbitar y hacer zoom.");
       } catch (error) {
         console.error(error);
         setStatus(
