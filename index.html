@@ -69,6 +69,11 @@
 
     async function main() {
       try {
+        // WebODM suele exportar modelos georreferenciados; este centro parece venir en coordenadas
+        // proyectadas tipo Web Mercator, así que lo convertimos a lon/lat para anclar el modelo.
+        const modelOrigin = Cesium.Cartesian3.fromDegrees(3.11783675551067, 34.18884819353365, 0.0);
+        const modelMatrix = Cesium.Transforms.eastNorthUpToFixedFrame(modelOrigin);
+
         const viewer = new Cesium.Viewer("cesiumContainer", {
           animation: false,
           baseLayerPicker: false,
@@ -100,6 +105,7 @@
           show: true,
           scale: 1.0,
           minimumPixelSize: 256.0,
+          modelMatrix,
         });
 
         viewer.scene.primitives.add(model);
@@ -110,7 +116,7 @@
           offset: new Cesium.HeadingPitchRange(0.0, Cesium.Math.toRadians(-30.0), sphere.radius * 3.0),
         });
 
-        setStatus("Modelo cargado. Si no lo ves, intenta hacer zoom in o abrir la consola.");
+        setStatus("Modelo cargado. Si no lo ves, el export de WebODM probablemente necesita conversión.");
       } catch (error) {
         console.error(error);
         setStatus(
