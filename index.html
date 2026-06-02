@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visor 3D Cliente</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+        }
+        /* El contenedor ocupa toda la pantalla del móvil */
+        model-viewer {
+            width: 100%;
+            height: 100%;
+            background-color: #f3f3f3;
+        }
+        .header-title {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(255,255,255,0.8);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            pointer-events: none;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+    </style>
+    <!-- Importa el componente de Google para renderizado 3D -->
+    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
+</head>
+<body>
+
+    <div class="header-title">Modelo 3D - Vista de Cliente</div>
+
+    <!-- Cambia ".glb" por la ruta de tu archivo -->
+    <model-viewer 
+        src="https://drive.google.com/file/d/16KVyEzF3OOdML3F6uPB0LrIWIe4_qsxr/view?usp=sharing" 
+        alt="Modelo 3D generado por WebODM" 
+        auto-rotate 
+        camera-controls 
+        touch-action="pan-y"
+        shadow-intensity="1">
+    </model-viewer>
+
+</body>
+</html>
