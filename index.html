@@ -51,7 +51,11 @@
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
     }
   </style>
-  <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
+  <script>
+    window.ModelViewerElement = window.ModelViewerElement || {};
+    window.ModelViewerElement.dracoDecoderLocation = "https://www.gstatic.com/draco/v1/decoders/";
+  </script>
+  <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.2.0/model-viewer.min.js"></script>
 </head>
 <body>
   <div id="status">Cargando visor 3D y modelo...</div>
