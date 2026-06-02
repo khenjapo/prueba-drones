@@ -83,7 +83,6 @@
           vrButton: false,
           terrainProvider: new Cesium.EllipsoidTerrainProvider(),
           imageryProvider: new Cesium.GridImageryProvider(),
-          requestRenderMode: true,
           useBrowserRecommendedResolution: true,
         });
 
@@ -100,15 +99,18 @@
           url: "./prueba-1.glb",
           show: true,
           scale: 1.0,
-          minimumPixelSize: 0.0,
+          minimumPixelSize: 256.0,
         });
 
         viewer.scene.primitives.add(model);
 
-        await viewer.zoomTo(model);
-        viewer.scene.requestRender();
+        const sphere = model.boundingSphere;
+        viewer.camera.flyToBoundingSphere(sphere, {
+          duration: 0.0,
+          offset: new Cesium.HeadingPitchRange(0.0, Cesium.Math.toRadians(-30.0), sphere.radius * 3.0),
+        });
 
-        setStatus("Modelo cargado. Si no lo ves, usa la rueda para acercarte un poco.");
+        setStatus("Modelo cargado. Si no lo ves, intenta hacer zoom in o abrir la consola.");
       } catch (error) {
         console.error(error);
         setStatus(
