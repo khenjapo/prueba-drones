@@ -1,54 +1,123 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Visor 3D Cliente</title>
-    <style>
-        body, html {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            font-family: Arial, sans-serif;
-        }
-        /* El contenedor ocupa toda la pantalla del móvil */
-        model-viewer {
-            display: block;
-            position: fixed;
-            inset: 0;
-            background-color: #f3f3f3;
-        }
-        .header-title {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            z-index: 10;
-            background: rgba(255,255,255,0.8);
-            padding: 8px 15px;
-            border-radius: 20px;
-            font-size: 14px;
-            pointer-events: none;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-    </style>
-    <!-- Importa el componente de Google para renderizado 3D -->
-    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Visor Cesium GLB</title>
+  <link
+    rel="stylesheet"
+    href="https://cesium.com/downloads/cesiumjs/releases/1.141/Build/Cesium/Widgets/widgets.css"
+  />
+  <style>
+    html,
+    body,
+    #cesiumContainer {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background: #0b1020;
+      font-family: Arial, sans-serif;
+    }
+
+    #status {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      z-index: 10;
+      max-width: min(90vw, 520px);
+      padding: 10px 14px;
+      border-radius: 14px;
+      background: rgba(11, 16, 32, 0.78);
+      color: #f3f6ff;
+      font-size: 14px;
+      line-height: 1.4;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.28);
+    }
+
+    #hint {
+      position: absolute;
+      right: 12px;
+      bottom: 12px;
+      z-index: 10;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.85);
+      color: #0b1020;
+      font-size: 12px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+    }
+  </style>
+  <script>
+    window.CESIUM_BASE_URL = "https://cesium.com/downloads/cesiumjs/releases/1.141/Build/Cesium/";
+  </script>
+  <script src="https://cesium.com/downloads/cesiumjs/releases/1.141/Build/Cesium/Cesium.js"></script>
 </head>
 <body>
+  <div id="cesiumContainer"></div>
+  <div id="status">Cargando Cesium y el modelo...</div>
+  <div id="hint">Arrastra para orbitar, rueda para zoom</div>
 
-    <div class="header-title">Modelo 3D - Vista de Cliente</div>
+  <script>
+    const statusEl = document.getElementById("status");
 
-    <!-- Carga el GLB local. Para GitHub Pages o un server, esta ruta debe apuntar al archivo accesible directamente. -->
-    <model-viewer 
-        src="./prueba-1.glb" 
-        alt="Modelo 3D generado por WebODM" 
-        auto-rotate 
-        camera-controls 
-        touch-action="pan-y"
-        shadow-intensity="1">
-    </model-viewer>
+    function setStatus(message) {
+      statusEl.textContent = message;
+    }
 
+    async function main() {
+      try {
+        const viewer = new Cesium.Viewer("cesiumContainer", {
+          animation: false,
+          baseLayerPicker: false,
+          fullscreenButton: false,
+          geocoder: false,
+          homeButton: false,
+          infoBox: false,
+          navigationHelpButton: false,
+          sceneModePicker: false,
+          selectionIndicator: false,
+          timeline: false,
+          vrButton: false,
+          terrainProvider: new Cesium.EllipsoidTerrainProvider(),
+          imageryProvider: new Cesium.GridImageryProvider(),
+          requestRenderMode: true,
+          useBrowserRecommendedResolution: true,
+        });
+
+        viewer.scene.globe.show = false;
+        viewer.scene.skyBox = undefined;
+        viewer.scene.skyAtmosphere = undefined;
+        viewer.scene.sun.show = false;
+        viewer.scene.moon.show = false;
+        viewer.scene.backgroundColor = Cesium.Color.fromCssColorString("#0b1020");
+
+        setStatus("Cargando modelo GLB...");
+
+        const model = await Cesium.Model.fromGltfAsync({
+          url: "./prueba-1.glb",
+          show: true,
+          scale: 1.0,
+          minimumPixelSize: 0.0,
+        });
+
+        viewer.scene.primitives.add(model);
+
+        await viewer.zoomTo(model);
+        viewer.scene.requestRender();
+
+        setStatus("Modelo cargado. Si no lo ves, usa la rueda para acercarte un poco.");
+      } catch (error) {
+        console.error(error);
+        setStatus(
+          "No se pudo cargar el modelo. Abre la consola del navegador para ver el error exacto."
+        );
+      }
+    }
+
+    main();
+  </script>
 </body>
 </html>
